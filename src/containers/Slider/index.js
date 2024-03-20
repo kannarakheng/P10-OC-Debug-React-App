@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
 import { useData } from "../../contexts/DataContext";
 import { getMonth } from "../../helpers/Date";
 
@@ -8,27 +8,29 @@ const Slider = () => {
   const { data } = useData();
   const [index, setIndex] = useState(0);
   const byDateDesc = data?.focus.sort((evtA, evtB) =>
-    new Date(evtA.date) < new Date(evtB.date) ? -1 : 1
+    // trier dans le bon sens les images de la plus récente à la plus ancienne, ordre décroissant
+    new Date(evtA.date) > new Date(evtB.date) ? -1 : 1
   );
   const nextCard = () => {
     setTimeout(
       () => setIndex(index + 1 < byDateDesc?.length ? index + 1 : 0),
-      3500
+      4000
     );
   };
   useEffect(() => {
     nextCard();
   });
+
   return (
     <div className="SlideCardList">
       {byDateDesc?.map((event, idx) => (
-        <Fragment key={event.title}>
+        <div key={event.date}>
           <div
             className={`SlideCard SlideCard--${
               index === idx ? "display" : "hide"
             }`}
           >
-            <img src={event.cover} alt="forum" />
+            <img src={event.cover} alt={event.title} />
             <div className="SlideCard__descriptionContainer">
               <div className="SlideCard__description">
                 <h3>{event.title}</h3>
@@ -37,22 +39,22 @@ const Slider = () => {
               </div>
             </div>
           </div>
-        </Fragment>
-      ))}
-      <div className="SlideCard__paginationContainer">
-        <div className="SlideCard__pagination">
-          {byDateDesc?.map((_, radioIdx) => (
-            <input
-              key={`radio-${_.title + getMonth(new Date(_.date))}`}
-              type="radio"
-              name="radio-button"
-              checked={index === radioIdx}
-              readOnly
-            />
-          ))}
+        <div className="SlideCard__paginationContainer">
+          <div className="SlideCard__pagination">
+            {byDateDesc?.map((_, radioIdx) => (
+              <input
+                key={_.date}
+                type="radio"
+                name="radio-button"
+                checked={index === radioIdx}
+                readOnly
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    ))}
+  </div>
   );
 };
 
